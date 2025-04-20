@@ -17,6 +17,11 @@ const TodoList = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [editText, setEditText] = useState('');
   const [editDueDateInput, setEditDueDateInput] = useState(''); 
+  const [newTaskPriority, setNewTaskPriority] = useState(''); 
+  const [editPriority, setEditPriority] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all'); 
+  const [editCategory, setEditCategory] = useState(''); 
+  const [newTaskCategory, setNewTaskCategory] = useState('other'); 
   const reminderInterval = useRef(null)
   const checkInterval = useRef(null);
   const speechSynth = useRef(window.speechSynthesis);
@@ -144,12 +149,15 @@ const TodoList = () => {
         text: parsed.text,
         dueDate: parsed.dueDate,
         completed: false,
+        priority: newTaskPriority || 'none',
+        category: newTaskCategory,
         rawInput: parsed.rawInput,
         addedByVoice: true
       };
       setTasks([...tasks, task]);
       setNewTask('');
       setParsedTask(null);
+      setNewTaskPriority('none');
     }
   };
 
@@ -178,12 +186,16 @@ const TodoList = () => {
       text: parsed.text,
       dueDate: parsed.dueDate,
       completed: false,
+      priority: newTaskPriority || 'none',
+      category: newTaskCategory,
       rawInput: parsed.rawInput,
       addedByVoice: isListening
     };
     
     setTasks([...tasks, task]);
     setNewTask('');
+    setNewTaskPriority('none'); 
+    setNewTaskCategory('other');
     setParsedTask(null);
     if (isListening) stopListening();
   };
@@ -212,7 +224,7 @@ const TodoList = () => {
     const pendingTasks = tasks.filter(task => 
       !task.completed && 
       (!task.dueDate || isAfter(parseISO(task.dueDate), now))
-    );
+    ).sort((a, b) => a.priority === 'high' ? -1 : 1);
 
     if (pendingTasks.length > 0) {
       setLastReminderTime(now);
@@ -267,7 +279,7 @@ const TodoList = () => {
       !task.completed && 
       isBefore(parseISO(task.dueDate), now) &&
       differenceInMinutes(now, parseISO(task.dueDate)) <= 15 // Within 15 mins of due time
-    );
+    ).sort((a, b) => a.priority === 'high' ? -1 : 1);
 
     if (dueTasks.length > 0) {
       showReminder(dueTasks);
@@ -505,7 +517,8 @@ const TodoList = () => {
   const startEditing = (task) => {
     setEditingTask(task.id);
     setEditText(task.text);
-    
+    setEditPriority(task.priority);
+    setEditCategory(task.category);
     // Convert stored ISO date back to natural language for editing
     if (task.dueDate) {
       const date = parseISO(task.dueDate);
@@ -536,6 +549,8 @@ const TodoList = () => {
         ...task, 
         text: parsed.text,
         dueDate: parsed.dueDate,
+        priority: editPriority,
+        category: editCategory,
         rawInput: `${editText} ${editDueDateInput}`.trim()
       } : task
     ));
@@ -548,6 +563,35 @@ const TodoList = () => {
     setEditingTask(null);
   };
 
+  const PRIORITY_OPTIONS = [
+    { value: "high", label: "🔥 High" },
+    { value: "medium", label: "⭐ Medium" },
+    { value: "low", label: "⬇️ Low" },
+    { value: "none", label: "No Priority" }
+  ];
+
+  const CATEGORY_OPTIONS = [
+    { value: "work", label: "💼 Work" },
+    { value: "personal", label: "👤 Personal" },
+    { value: "shopping", label: "🛒 Shopping" },
+    { value: "health", label: "🏥 Health" },
+    { value: "other", label: "📌 Other" }
+  ];
+ 
+  const filteredTasks = filterCategory === 'all' 
+    ? tasks 
+    : tasks.filter(task => task.category === filterCategory);
+
+  // Sort tasks by priority (high first) then by due date
+const sortedTasks = [...filteredTasks].sort((a, b) => {
+  const priorityOrder = { high: 1, medium: 2, low: 3, none: 4 };
+  if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
+  }
+  return new Date(a.dueDate) - new Date(b.dueDate);
+});
+
+// Use sortedTasks instead of tasks in your render
   // Get AI suggestions
   
 
@@ -577,7 +621,36 @@ const TodoList = () => {
           {isListening ? 'Stop Listening' : 'Voice Input'}
         </button>
       </div>
-      
+      <div className="input-options"> 
+      <div className="priority-select">
+  <label>Priority:</label>
+  <select 
+    value={newTaskPriority} 
+    onChange={(e) => setNewTaskPriority(e.target.value)}
+  >
+    {PRIORITY_OPTIONS.map(option => (
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+</div>
+
+<div className="category-select">
+          <label>Category:</label>
+          <select 
+            value={newTaskCategory} 
+            onChange={(e) => setNewTaskCategory(e.target.value)}
+          >
+            {CATEGORY_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        </div>
+        
       {isListening && (
         <div className="voice-status">
           <div className="pulse"></div>
@@ -593,10 +666,27 @@ const TodoList = () => {
           )}
         </div>
       )}
-      
+      <div className="category-filters">
+        <button 
+          className={filterCategory === 'all' ? 'active' : ''}
+          onClick={() => setFilterCategory('all')}
+        >
+          All Tasks
+        </button>
+        {CATEGORY_OPTIONS.map(category => (
+          <button
+            key={category.value}
+            className={`${category.value} ${filterCategory === category.value ? 'active' : ''}`}
+            onClick={() => setFilterCategory(category.value)}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
       <div className="task-list">
-        {tasks.map(task => (
-          <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+        {sortedTasks.map(task => (
+          <div key={task.id} className={`task-item ${task.completed ? 'completed' : ''} priority-${task.priority}`}>
            {editingTask === task.id ? (
               <div className="edit-form">
                 <input
@@ -610,6 +700,26 @@ const TodoList = () => {
             onChange={(e) => setEditDueDateInput(e.target.value)}
             placeholder="Due date (e.g., 'tomorrow 3pm')"
           />
+          <select
+    value={editPriority}
+    onChange={(e) => setEditPriority(e.target.value)}
+  >
+    {PRIORITY_OPTIONS.map(option => (
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+  <select
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                  >
+                    {CATEGORY_OPTIONS.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 <div className="edit-actions">
                   <button onClick={saveEdit}>Save</button>
                   <button onClick={cancelEdit}>Cancel</button>
@@ -617,6 +727,7 @@ const TodoList = () => {
               </div>
             ) : (
               <>
+              <div className="task-main">
             <button 
               onClick={() => toggleTask(task.id)}
               className={`toggle-btn ${task.completed ? 'completed' : ''}`}
@@ -624,7 +735,16 @@ const TodoList = () => {
             >
               <span className="toggle-thumb" />
             </button>
+            <br/>
             <div className="task-content">
+            <div className="task-meta">
+                      <span className={`category-badge ${task.category}`}>
+                        {CATEGORY_OPTIONS.find(c => c.value === task.category)?.label}
+                      </span>
+                      <span className="priority-label">
+                        {PRIORITY_OPTIONS.find(p => p.value === task.priority)?.label}
+                      </span>
+                    </div>
               <span>{task.text}</span>
               {task.dueDate && (
                 <span className="due-date">
@@ -641,7 +761,7 @@ const TodoList = () => {
                   {timeLeft[task.id] || formatDueDate(task.dueDate)}
                 </span>
               )}
-              
+                            
               {task.addedByVoice && <span className="voice-badge">Voice</span>}
             </div>
             <div className="task-actions">
@@ -651,6 +771,7 @@ const TodoList = () => {
                   </button>
                   <button onClick={() => deleteTask(task.id)}>Delete</button>
                 </div>
+                </div> 
                 </>
             )}
           </div>

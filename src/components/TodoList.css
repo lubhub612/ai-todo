@@ -588,4 +588,240 @@ h1 {
   color: white;
 }
 
+/* Priority indicators */
+.task-item.priority-high {
+  border-left: 4px solid #ff5252;
+  background-color: #fff5f5;
+}
+
+.task-item.priority-medium {
+  border-left: 4px solid #ffc107;
+  background-color: #fff9e6;
+}
+
+.task-item.priority-low {
+  border-left: 4px solid #4caf50;
+  background-color: #f1f8e9;
+}
+
+.task-priority {
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.priority-high .task-priority {
+  color: #ff5252;
+}
+
+.priority-medium .task-priority {
+  color: #ffc107;
+}
+
+.priority-low .task-priority {
+  color: #4caf50;
+}
+
+.priority-select {
+  margin: 10px 0;
+}
+
+.priority-select select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  margin-left: 10px;
+}
+
+.task-main {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.task-item.priority-high {
+  border-left: 5px solid #e74c3c;
+  background-color: #fff5f5;
+}
+
+.task-item.priority-medium {
+  border-left: 5px solid #f39c12;
+  background-color: #fff9e6;
+}
+
+.task-item.priority-low {
+  border-left: 5px solid #2ecc71;
+  background-color: #f1f8e9;
+}
+
+.task-item.completed {
+  opacity: 0.7;
+  background-color: #f9f9f9;
+}
+
+.task-item.completed .task-content span:first-child {
+  text-decoration: line-through;
+  color: #95a5a6;
+}
+
+/* Add to your existing TodoList.css */
+
+.category-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 200px;
+}
+
+.category-select label {
+  font-weight: normal;
+  
+}
+
+.category-select select {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: white;
+}
+
+.category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.category-filters button {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.category-filters button.active {
+  border-color: #3498db;
+  background-color: #3498db;
+  color: white;
+}
+
+.category-filters button.work {
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.category-filters button.work.active {
+  background-color: #3498db;
+}
+
+.category-filters button.personal {
+  border-color: #9b59b6;
+  color: #9b59b6;
+}
+
+.category-filters button.personal.active {
+  background-color: #9b59b6;
+}
+
+.category-filters button.shopping {
+  border-color: #2ecc71;
+  color: #2ecc71;
+}
+
+.category-filters button.shopping.active {
+  background-color: #2ecc71;
+}
+
+.category-filters button.health {
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.category-filters button.health.active {
+  background-color: #e74c3c;
+}
+
+.category-filters button.other {
+  border-color: #95a5a6;
+  color: #95a5a6;
+}
+
+.category-filters button.other.active {
+  background-color: #95a5a6;
+}
+
+.task-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.category-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.category-badge.work {
+  background-color: #e1f0fa;
+  color: #2980b9;
+}
+
+.category-badge.personal {
+  background-color: #f0e5f5;
+  color: #8e44ad;
+}
+
+.category-badge.shopping {
+  background-color: #e1f7eb;
+  color: #27ae60;
+}
+
+.category-badge.health {
+  background-color: #fdecea;
+  color: #c0392b;
+}
+
+.category-badge.other {
+  background-color: #f2f4f4;
+  color: #7f8c8d;
+}
+
+.edit-options {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-options select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Update task item styling */
+.task-item.priority-high {
+  border-left: 5px solid #e74c3c;
+}
+
+.task-item.priority-medium {
+  border-left: 5px solid #f39c12;
+}
+
+.task-item.priority-low {
+  border-left: 5px solid #2ecc71;
+}
+
+/* Update reminder alert styling */
+.reminder-alert li .category-badge {
+  margin-right: 8px;
+}
+
+
+
 /* ... (keep other existing styles) */
